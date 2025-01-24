@@ -18,8 +18,8 @@ class CreateOrUpdateUserApiView(generics.GenericAPIView):
 
     @swagger_auto_schema(tags = ['Autherization'])
     def post(self,request):
-        try:
-            serializers = self.serializser_class(data = request.data, context={request:request})
+        # try:
+            serializers = self.serializer_class(data = request.data, context={request:request})
 
             if not serializers.is_valid():
                 self.response_format['status_code'] = status.HTTP_400_BAD_REQUEST
@@ -44,7 +44,7 @@ class CreateOrUpdateUserApiView(generics.GenericAPIView):
             self.response_format['message'] = 'User created or updated successfully'      
             return Response(self.response_format,status=status.HTTP_201_CREATED)
 
-        except Exception as e:
+        # except Exception as e:
             exec_type ,exc_obj,exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             self.response_format['status_code'] = status.HTTP_500_INTERNAL_SERVER_ERROR

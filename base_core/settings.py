@@ -49,9 +49,8 @@ LOCAL_APPS = [
 
 THIRD_PARTY_APPS = [
     'drf_yasg',
-    # 'debug_toolbar',
-    # 'django_extensions',
     'rest_framework',
+    'corsheaders',
 
 ]
 
