@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from apps.user.models import User
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate,login
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True,required=True)
@@ -29,8 +31,25 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             if password.isdigit():
                 raise serializers.ValidationError({'password': 'password cannot be completely numerical'})
 
-
+            user_info = ['user_name','email','phone_number','first_name','last_name']
+            if any(info and info.lower() == password.lower() for info in user_info):
+                raise serializers.ValidationError({'password':'password cannot contain any of the user information'})
+            
             return data
+        
+        def create(self,validated_data):
+            validated_data.pop('confirm_password') #Remove confirm_password from the validated_data and keep only password
+            plane_password = validated_data['password']
+
+            validated_data['password'] = make_password(plane_password)
+            user = User.objects.create(**validated_data)
+
+            request = self.context['request']
+            authenticated_user = authenticate(user_name=user.user_name,password=plane_password)
+            if authenticated_user:
+                login(request,authenticated_user)
+
+            return user
     
 
 
