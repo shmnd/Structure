@@ -48,6 +48,10 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'drf_yasg',
+    # 'debug_toolbar',
+    # 'django_extensions',
+    'rest_framework',
 
 ]
 
@@ -68,7 +72,7 @@ ROOT_URLCONF = 'base_core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,7 +87,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'base_core.wsgi.application'
 
-AUTH_USER_MODEL = 'user.User' # This is the custom user model (app name and model name)
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -145,3 +148,19 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'user.User' # This is the custom user model (app name and model name)
+
+
+SWAGER_SETTINGS = {
+    'DEFAULT_API_URL' : os.environ.get('SWAGGER_DEFAULT_API_URL',""),
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS' : {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+}
+
