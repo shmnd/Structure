@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin,BaseUserManager
 from datetime import timezone,timedelta
+from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 class AbstractDateFieldMix(models.Model):
@@ -10,6 +11,31 @@ class AbstractDateFieldMix(models.Model):
     class Meta:
         abstract = True
 
+
+class UserManager(BaseUserManager):
+    def create_user(self,username,password=None,replica_db=None, **extra_fields):
+        if not username:
+            raise ValueError(_('Username must be set'))
+        
+        user = self.model(username=username,replica_db=replica_db,**extra_fields)
+
+        if password:
+            user.set_password(password.strip())
+
+        user.save(using=replica_db)
+
+        return user
+    
+    def create_superuser(self,username,password=None,repica_db=None,**extra_fields):
+        extra_fields.setdefault('is_superuser',True)
+        extra_fields.setdefault('is_active',True)
+
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser = True'))
+        
+        return self.create_user(username,password,**extra_fields)
+        
+
 class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
 
     class GenderType(models.TextChoices):
@@ -18,7 +44,7 @@ class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
         other = "Other"
 
     email               = models.EmailField(unique=True, null=True,blank=True)
-    user_name           = models.CharField(unique=True,null=True,blank=True,max_length=100)
+    username            = models.CharField(unique=True,null=True,blank=True,max_length=100)
     date_joined         = models.DateTimeField(null=True,blank=True)
     first_name          = models.CharField(max_length=100,blank=True,null=True)
     last_login          = models.DateTimeField(null=True,blank=True)
@@ -33,9 +59,12 @@ class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
     is_admin           = models.BooleanField(default=False,blank=True, null=True)
     is_doctor          = models.BooleanField(default=False,blank=True, null=True)
     department         = models.CharField(max_length=100,blank=True,null=True)
+    replica_db          = models.CharField(max_length=20,choices=[('replica_1','Replica_1'),('replica_2','Replica_2')])
 
-    USERNAME_FIELD = 'user_name'
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
+
+    objects = UserManager()
 
 
     def set_otp(self,otp):

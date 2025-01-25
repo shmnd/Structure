@@ -1,6 +1,6 @@
 from rest_framework import generics,status
 from base_core.helpers.response import ResponseInfo
-from apps.user.serializers import UserRegistrationSerializer
+from apps.user.serializers import UserRegistrationSerializer,UserLoginSerializer
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from apps.user.models import User
@@ -29,7 +29,7 @@ class CreateOrUpdateUserApiView(generics.GenericAPIView):
             
             user_instance = get_object_or_none(User,pk=serializers.validated_data.get('user',None))
 
-            serializers = self.serializer_class(user_instance,data=request.data,context={'request:request'})
+            serializers = self.serializer_class(user_instance,data=request.data,context={'request':request})
 
             if not serializers.is_valid():
                 self.response_format['status_code'] = status.HTTP_400_BAD_REQUEST
@@ -51,6 +51,16 @@ class CreateOrUpdateUserApiView(generics.GenericAPIView):
             self.response_format['status'] = False
             self.response_format['message'] = f"Error occured in {exec_type},File:{fname}, line number {exc_tb.tb_lineno},Error:{str(e)}"
             return Response(self.response_format,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# class LoginApiView(generics.GenericAPIView):
+#     def __init__(self, **kwargs):
+#         self.response_format = ResponseInfo().response
+#         super(LoginApiView,self).__init__(**kwargs)
+
+#     serializer_class = UserLoginSerializer
+
+#     @swagger_auto_schema(tags=['Autherization'])
 
 
 
