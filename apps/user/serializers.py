@@ -17,7 +17,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         }
 
     def validate(self,data):
-        print('in validdd')
         password            = data.get('password')
         confirm_password    = data.get('confirm_password')
         username           = data.get('username')
@@ -30,7 +29,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'phone_number':'phone number must be 10 digits'})
 
         if password != confirm_password:
-            print('hiiiiiiiiiiiii')
             raise serializers.ValidationError({'password': 'passwords must match'})
         if len(password)<8:
             raise serializers.ValidationError({'password':'password must be atleast 8 charactera'})

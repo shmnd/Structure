@@ -29,9 +29,13 @@ class UserManager(BaseUserManager):
     def create_superuser(self,username,password=None,repica_db=None,**extra_fields):
         extra_fields.setdefault('is_superuser',True)
         extra_fields.setdefault('is_active',True)
+        extra_fields.setdefault('is_staff',True)
 
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser = True'))
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff = True'))
+
         
         return self.create_user(username,password,**extra_fields)
         
@@ -56,10 +60,12 @@ class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
     confirm_password    = models.CharField(max_length=225,blank=True,null=True,editable=False)
     otp                 = models.CharField(max_length=6,blank=True,null=True)    
     otp_expiry          = models.DateTimeField(blank=True,null=True)
-    is_admin           = models.BooleanField(default=False,blank=True, null=True)
-    is_doctor          = models.BooleanField(default=False,blank=True, null=True)
+    is_admin           = models.BooleanField(default=False)
+    is_staff           = models.BooleanField(default=False)
+    is_superuser           = models.BooleanField(default=False)
+    is_doctor          = models.BooleanField(default=False)
     department         = models.CharField(max_length=100,blank=True,null=True)
-    replica_db          = models.CharField(max_length=20,choices=[('replica_1','Replica_1'),('replica_2','Replica_2')])
+    replica_db          = models.CharField(max_length=20,choices=[('replica_1','Replica_1'),('replica_2','Replica_2')],blank=True, null=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
@@ -75,6 +81,9 @@ class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
+    # def __str__(self):
+    #     return self.username if self.username else "Unnamed User"
+
 
 class GeneratedAccessToken(AbstractDateFieldMix):
     token = models.TextField()
@@ -82,8 +91,3 @@ class GeneratedAccessToken(AbstractDateFieldMix):
 
     def __str__(self):
         return self.token
-
-    
-
-
-    
