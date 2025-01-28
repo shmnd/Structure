@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os,dj_database_url
 from dotenv import load_dotenv
+from typing import Optional,List
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,8 +28,39 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+# Assuming get_list is a function that converts a comma-separated string to a list
+def get_list(value: Optional[str]) -> list[str]:
+    if value is None:
+        return []
+    return [v.strip() for v in value.split(',') if v.strip()]
 
+
+CSRF_TRUSTED_ORIGINS  = get_list(os.environ.get("CSRF_TRUSTED_ORIGINS","http://127.0.0.1:8000"))
+CSRF_TRUSTED_ORIGINS.extend(['*'])
+
+
+CORS_ALLOWED_ORIGINS: Optional[List[str]] = get_list(os.environ.get("CORS_ALLOWED_ORIGINS", "http://127.0.0.1:8000"))
+CORS_ALLOWED_ORIGINS.extend(['*'])
+
+
+CORS_ORIGIN_WHITELIST: Optional[List[str]] = get_list(os.environ.get("CORS_ORIGIN_WHITELIST", "http://localhost:3000"))
+CORS_ORIGIN_WHITELIST.extend(['*'])
+
+
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    '*',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
+
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1",
+
+]
 
 # Application definition
 

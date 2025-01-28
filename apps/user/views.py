@@ -6,19 +6,22 @@ from rest_framework.response import Response
 from apps.user.models import User
 from base_core.helpers.helpers import get_object_or_none
 import sys,os
+from rest_framework.permissions import AllowAny
+
 # Create your views here.
 
 class CreateOrUpdateUserApiView(generics.GenericAPIView):
-    
+    permission_classes = [AllowAny]
+
     def __init__(self,**kwargs):
         self.response_format = ResponseInfo().response
         super(CreateOrUpdateUserApiView,self).__init__(**kwargs)
 
-    serializer_class = UserRegistrationSerializer
 
+    serializer_class = UserRegistrationSerializer
     @swagger_auto_schema(tags = ['Autherization'])
     def post(self,request):
-        # try:
+        try:
             serializers = self.serializer_class(data = request.data, context={request:request})
 
             if not serializers.is_valid():
@@ -44,7 +47,7 @@ class CreateOrUpdateUserApiView(generics.GenericAPIView):
             self.response_format['message'] = 'User created or updated successfully'      
             return Response(self.response_format,status=status.HTTP_201_CREATED)
 
-        # except Exception as e:
+        except Exception as e:
             exec_type ,exc_obj,exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             self.response_format['status_code'] = status.HTTP_500_INTERNAL_SERVER_ERROR
