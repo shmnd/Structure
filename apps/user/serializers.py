@@ -4,12 +4,14 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate,login
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    phone_number = serializers.CharField(required=True)    
     password = serializers.CharField(write_only=True,required=True)
     confirm_password =serializers.CharField(write_only=True,required=True)
 
     class Meta:
         model = User
-        fields = ['email','username','first_name','gender','phone_number','password','confirm_password','profile_image']
+        fields = ['email','username','full_name','gender','phone_number','password','confirm_password','profile_image']
 
         extra_kwargs = {
             'password' : {'write_only':True},
@@ -23,7 +25,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         email               = data.get('email')
         phone               = data.get('phone_number')
         gender              = data.get ('gender')
-        first_name          = data.get('first_name')
+        full_name          = data.get('full_name')
 
         if phone and len(phone) != 10:
             raise serializers.ValidationError({'phone_number':'phone number must be 10 digits'})
@@ -35,7 +37,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if password.isdigit():
             raise serializers.ValidationError({'password': 'password cannot be completely numerical'})
 
-        user_info = ['username','email','phone_number','first_name','last_name']
+        user_info = ['username','email','phone_number','full_name','last_name']
         if any(info and info.lower() == password.lower() for info in user_info):
             raise serializers.ValidationError({'password':'password cannot contain any of the user information'})
         

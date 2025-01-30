@@ -50,7 +50,7 @@ class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
     email               = models.EmailField(unique=True, null=True,blank=True)
     username            = models.CharField(unique=True,null=True,blank=True,max_length=100)
     date_joined         = models.DateTimeField(null=True,blank=True)
-    first_name          = models.CharField(max_length=100,blank=True,null=True)
+    full_name          = models.CharField(max_length=100,blank=True,null=True)
     last_login          = models.DateTimeField(null=True,blank=True)
     is_active           = models.BooleanField(default=True)
     profile_image       = models.FileField(blank=True, null=True)
