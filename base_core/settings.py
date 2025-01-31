@@ -83,6 +83,7 @@ THIRD_PARTY_APPS = [
     'drf_yasg',
     'rest_framework',
     'corsheaders',
+    "rest_framework_simplejwt",
 
 ]
 
@@ -195,3 +196,26 @@ SWAGER_SETTINGS = {
     },
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framwork.authentication.TokenAuthentication',
+    )
+}
+
+
+SIMPLE_JWT = {
+  
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'eShVmYq3t6w9z$C&E)H@McQfTjWnZr4u7x!A%D*G-JaNdRgUkXp2s5v8y/B?E(H+',
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+}

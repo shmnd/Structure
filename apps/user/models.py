@@ -43,14 +43,14 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
 
     class GenderType(models.TextChoices):
-        male = "Male"
-        female = "Female"
-        other = "Other"
+        male    = "Male"
+        female  = "Female"
+        other   = "Other"
 
     email               = models.EmailField(unique=True, null=True,blank=True)
     username            = models.CharField(unique=True,null=True,blank=True,max_length=100)
     date_joined         = models.DateTimeField(null=True,blank=True)
-    full_name          = models.CharField(max_length=100,blank=True,null=True)
+    full_name           = models.CharField(max_length=100,blank=True,null=True)
     last_login          = models.DateTimeField(null=True,blank=True)
     is_active           = models.BooleanField(default=True)
     profile_image       = models.FileField(blank=True, null=True)
@@ -58,13 +58,13 @@ class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
     phone_number        = models.CharField(max_length=15,blank=True,null=True)
     password            = models.CharField(max_length=225,blank=True,null=True,editable=False)
     confirm_password    = models.CharField(max_length=225,blank=True,null=True,editable=False)
-    otp                 = models.CharField(max_length=6,blank=True,null=True)    
+    otp                 = models.CharField(max_length=6,blank=True,null=True)
     otp_expiry          = models.DateTimeField(blank=True,null=True)
-    is_admin           = models.BooleanField(default=False)
-    is_staff           = models.BooleanField(default=False)
-    is_superuser           = models.BooleanField(default=False)
-    is_doctor          = models.BooleanField(default=False)
-    department         = models.CharField(max_length=100,blank=True,null=True)
+    is_admin            = models.BooleanField(default=False)
+    is_staff            = models.BooleanField(default=False)
+    is_superuser        = models.BooleanField(default=False)
+    is_doctor           = models.BooleanField(default=False)
+    department          = models.CharField(max_length=100,blank=True,null=True)
     replica_db          = models.CharField(max_length=20,choices=[('replica_1','Replica_1'),('replica_2','Replica_2')],blank=True, null=True)
 
     USERNAME_FIELD = 'username'
@@ -81,8 +81,6 @@ class User(AbstractBaseUser,PermissionsMixin,AbstractDateFieldMix):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
-    # def __str__(self):
-    #     return self.username if self.username else "Unnamed User"
 
 
 class GeneratedAccessToken(AbstractDateFieldMix):

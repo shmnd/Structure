@@ -50,11 +50,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(plane_password)
         user = User.objects.create(**validated_data)
 
-        request = self.context['request']
-        authenticated_user = authenticate(username=user.username,password=plane_password)
-        if authenticated_user:
-            login(request,authenticated_user)
-
         return user
         
 class UserLoginSerializer(serializers.ModelSerializer):

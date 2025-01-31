@@ -29,8 +29,8 @@ schema_view = get_schema_view(
         terms_of_service= "",
         contact= openapi.Contact(email="shamnad.oditibiz@gmail.com"),
     ),
-    public=True,
-    permission_classes=[permissions.AllowAny]
+    # public=True,
+    # permission_classes=[permissions.AllowAny]
 )
 
 urlpatterns = [
