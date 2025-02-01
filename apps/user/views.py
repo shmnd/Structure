@@ -90,9 +90,9 @@ class LoginApiView(generics.GenericAPIView):
                     token = str(refresh.access_token)
 
                     data = {
-                        user:serializers.data,
-                        token:token,
-                        refresh:str(refresh)
+                        "user":serializers.data,
+                        "token":token,
+                        "refresh":str(refresh)
                     }
                     GeneratedAccessToken.objects.create(user=user,token=token)
 
