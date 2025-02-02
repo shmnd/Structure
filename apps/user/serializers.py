@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.user.models import User
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import authenticate,login
+from rest_framework_simplejwt.tokens import RefreshToken,TokenError
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
@@ -48,6 +48,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         plane_password = validated_data['password']
 
         validated_data['password'] = make_password(plane_password)
+
         user = User.objects.create(**validated_data)
 
         return user
@@ -59,6 +60,29 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username','password']
+
+
+class UserLogoutSerializers(serializers.Serializer):
+    refresh  = serializers.CharField()
+
+    default_error_messages = {
+        'bad_token':'Token is expired or invalid'
+    }
+
+    def validate(self,attrs):
+        self.token = attrs['refresh']
+
+        return attrs
+    
+    def save(self,**kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            self.fail('bad_token')
+
+
+
+
     
 
 

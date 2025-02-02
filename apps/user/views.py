@@ -1,26 +1,29 @@
+import sys,os
+from typing import Any
 from rest_framework import generics,status
 from base_core.helpers.response import ResponseInfo
-from apps.user.serializers import UserRegistrationSerializer,UserLoginSerializer
+from apps.user.serializers import UserRegistrationSerializer,UserLoginSerializer,UserLogoutSerializers
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from apps.user.models import User,GeneratedAccessToken
-from base_core.helpers.helpers import get_object_or_none
-import sys,os
+from base_core.helpers.helpers import get_object_or_none,get_token_user_or_none
 from rest_framework.permissions import AllowAny
 from django.contrib import auth
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from base_core.middleware.JWTAuthentications import BlackListedTokenAuthentication
 # Create your views here.
 
 class CreateOrUpdateUserApiView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
-    def __init__(self,**kwargs):
+    def __init__(self,**kwargs:Any):
         self.response_format = ResponseInfo().response
         super(CreateOrUpdateUserApiView,self).__init__(**kwargs)
 
 
     serializer_class = UserRegistrationSerializer
-    @swagger_auto_schema(tags = ['Autherization'])
+    @swagger_auto_schema(tags=['Autherization'])
     def post(self,request):
         try:
             serializers = self.serializer_class(data = request.data, context={request:request})
@@ -113,9 +116,44 @@ class LoginApiView(generics.GenericAPIView):
             self.response_format['status_code'] = status.HTTP_500_INTERNAL_SERVER_ERROR
             self.response_format['message'] = f"Error occured in {exec_type},File:{fname}, line number {exc_tb.tb_lineno},Error:{str(e)}"
             return Response(self.response_format,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
-            
+class LogoutApiView(generics.GenericAPIView):
+    
+    def __init__(self, **kwargs: Any):
+        self.response_format = ResponseInfo().response
+        super(LogoutApiView, self).__init__(**kwargs)
+        
+    serializer_class          = UserLogoutSerializers
+    permission_classes        = (IsAuthenticated,)
+    authentication_classes    = [BlackListedTokenAuthentication]
+    
+    @swagger_auto_schema(tags=["Authorization"])
+    def post(self, request):
+        
+        try:
+            user = get_token_user_or_none(request)
+            if user is not None:
+                GeneratedAccessToken.objects.filter(user=user).delete()
+                user.save()
+        
+            self.response_format['status'] = True
+            self.response_format['status_code'] = status.HTTP_200_OK
+            return Response(self.response_format, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            self.response_format['status'] = False
+            self.response_format['status_code'] = status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.response_format['message'] = str(e)
+            return Response(self.response_format, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# class TestApiView(generics.GenericAPIView):
 
+#     @swagger_auto_schema(tags=["Autherization"])
+
+    
+
+#     def post(self):
+#         pass
 
