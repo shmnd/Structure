@@ -9,10 +9,8 @@ def get_object_or_none(class_model,**kwargs):
 
 def get_token_user_or_none(request):
     User = get_user_model()
-    print(User,'userrrrrrrrrrr')
     try:
-        instance =User.objects.filter(id=request.user.id)
-        print(instance,'instnceeeeeeeeeeeeee')
+        instance = User.objects.get(id=request.user.id)
     except Exception:
         instance = None
     finally:

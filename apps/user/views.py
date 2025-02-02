@@ -128,7 +128,7 @@ class LogoutApiView(generics.GenericAPIView):
     permission_classes        = (IsAuthenticated,)
     authentication_classes    = [BlackListedTokenAuthentication]
     
-    @swagger_auto_schema(tags=["Authorization"])
+    @swagger_auto_schema(tags=["Autherization"])
     def post(self, request):
         
         try:
@@ -148,12 +148,4 @@ class LogoutApiView(generics.GenericAPIView):
             return Response(self.response_format, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# class TestApiView(generics.GenericAPIView):
-
-#     @swagger_auto_schema(tags=["Autherization"])
-
-    
-
-#     def post(self):
-#         pass
 
