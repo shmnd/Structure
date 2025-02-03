@@ -1,17 +1,23 @@
 import sys,os
+import random
+from datetime import timedelta
+from django.utils import timezone,
 from typing import Any
 from rest_framework import generics,status
 from base_core.helpers.response import ResponseInfo
-from apps.user.serializers import UserRegistrationSerializer,UserLoginSerializer,UserLogoutSerializers
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
-from apps.user.models import User,GeneratedAccessToken
 from base_core.helpers.helpers import get_object_or_none,get_token_user_or_none
 from rest_framework.permissions import AllowAny
 from django.contrib import auth
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from base_core.middleware.JWTAuthentications import BlackListedTokenAuthentication
+from apps.user.schemas import UserForgotPassword
+from apps.user.serializers import UserRegistrationSerializer,UserLoginSerializer,UserLogoutSerializers
+from apps.user.models import User,GeneratedAccessToken
+from base_core import settings
+
 # Create your views here.
 
 class CreateOrUpdateUserApiView(generics.GenericAPIView):
@@ -146,6 +152,49 @@ class LogoutApiView(generics.GenericAPIView):
             self.response_format['status_code'] = status.HTTP_500_INTERNAL_SERVER_ERROR
             self.response_format['message'] = str(e)
             return Response(self.response_format, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class UserForgetPasswordApiView(generics.GenericAPIView):
+    def __init__(self, **kwargs):
+        self.response_format = ResponseInfo().response
+        super(UserForgetPasswordApiView,self).__init__(**kwargs)
+
+    serializer_class = UserForgotPassword
+    @swagger_auto_schema(tags=['Autherization'])
+
+    def post(self,request):
+        try:
+            user_email = request.data.get('user_email',None)
+            user_instance = User.objects.filter(email=user_email).first()
+
+            if not user_instance:
+                self.response_format['status']=False
+                self.response_format['status_code']=status.HTTP_404_NOT_FOUND
+                self.response_format['message']='User not found'
+                return Response(self.response_format,status=status.HTTP_404_NOT_FOUND)
+            
+            otp = random.randint(1000,9999)
+            otp_expiry = timezone.now() + timedelta(minutes=5)
+
+            user_instance.otp = otp
+            user_instance.otp_expiry = otp_expiry
+            user_instance.save()
+
+            subject = 'Password Reset OTP'
+            context={
+                'otp':otp,
+                'email':user_email,
+                'user':user_instance,
+                'domain':settings.EMAIL_DOMAIN,
+                'protocol':'https'
+            }
+            try:
+                pass
+            except Exception as e:
+                pass
+
+        except Exception as e:
+            pass
 
 
 
