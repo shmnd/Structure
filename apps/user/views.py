@@ -1,7 +1,8 @@
 import sys,os
 import random
+import threading
 from datetime import timedelta
-from django.utils import timezone,
+from django.utils import timezone
 from typing import Any
 from rest_framework import generics,status
 from base_core.helpers.response import ResponseInfo
@@ -17,6 +18,7 @@ from apps.user.schemas import UserForgotPassword
 from apps.user.serializers import UserRegistrationSerializer,UserLoginSerializer,UserLogoutSerializers
 from apps.user.models import User,GeneratedAccessToken
 from base_core import settings
+from base_core.helpers.mail_function import SendEmial
 
 # Create your views here.
 
@@ -163,7 +165,7 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
     @swagger_auto_schema(tags=['Autherization'])
 
     def post(self,request):
-        try:
+        # try:
             user_email = request.data.get('user_email',None)
             user_instance = User.objects.filter(email=user_email).first()
 
@@ -189,12 +191,27 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
                 'protocol':'https'
             }
             try:
-                send_mail = send_mail()
+                send_mail = SendEmial()
+                mail_sending = threading.Thread(target=send_mail.sendTemplateMail,args=(subject,request,context,'password_otp.html',settings.EMAIL_HOST_USER,user_email))
+                mail_sending.start()
+                request.session['user_email'] = user_email
+                
+                self.response_format['status'] = True
+                self.response_format['status_code'] = status.HTTP_200_OK
+                self.response_format['message'] = "Email sended successfull"
+                return Response(self.response_format,status=status.HTTP_200_OK)
+            
             except Exception as e:
-                pass
+                self.response_format['status'] = False
+                self.response_format['status_code'] = status.HTTP_400_BAD_REQUEST
+                self.response_format['message'] = 'Please enter valid Email'
+                return Response(self.response_format,status=status.HTTP_400_BAD_REQUEST)
 
-        except Exception as e:
-            pass
+        # except Exception as e:
+            self.response_format['status'] = False
+            self.response_format['status_code'] = status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.response_format['message'] = 'Please enter valid email'
+            return Response(self.response,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

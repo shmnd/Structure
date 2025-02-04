@@ -7,4 +7,4 @@ class UserForgotPassword(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['user_email   ']
+        fields = ['user_email']
