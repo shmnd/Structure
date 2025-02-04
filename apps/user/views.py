@@ -189,7 +189,7 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
                 'protocol':'https'
             }
             try:
-                pass
+                send_mail = send_mail()
             except Exception as e:
                 pass
 
