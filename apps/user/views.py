@@ -189,7 +189,6 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
                 'domain':settings.EMAIL_DOMAIN,
                 'protocol':'https'
             }
-
             try:
                 send_mail = SendEmail()
                 mail_sending = threading.Thread(
