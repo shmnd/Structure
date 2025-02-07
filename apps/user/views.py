@@ -18,7 +18,7 @@ from apps.user.schemas import UserForgotPassword
 from apps.user.serializers import UserRegistrationSerializer,UserLoginSerializer,UserLogoutSerializers
 from apps.user.models import User,GeneratedAccessToken
 from base_core import settings
-from base_core.helpers.mail_function import SendEmial
+from base_core.helpers.mail_function import SendEmail
 
 # Create your views here.
 
@@ -177,11 +177,10 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
             
             otp = random.randint(1000,9999)
             otp_expiry = timezone.now() + timedelta(minutes=5)
-
             user_instance.otp = otp
             user_instance.otp_expiry = otp_expiry
             user_instance.save()
-
+        
             subject = 'Password Reset OTP'
             context={
                 'otp':otp,
@@ -190,12 +189,16 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
                 'domain':settings.EMAIL_DOMAIN,
                 'protocol':'https'
             }
+
             try:
-                send_mail = SendEmial()
-                mail_sending = threading.Thread(target=send_mail.sendTemplateMail,args=(subject,request,context,'password_otp.html',settings.EMAIL_HOST_USER,user_email))
+                send_mail = SendEmail()
+                mail_sending = threading.Thread(
+                    target=send_mail.sendTemplateMail,
+                    args=(subject,context,'password_otp.html',settings.EMAIL_HOST_USER,user_email)
+                )
                 mail_sending.start()
                 request.session['user_email'] = user_email
-                
+
                 self.response_format['status'] = True
                 self.response_format['status_code'] = status.HTTP_200_OK
                 self.response_format['message'] = "Email sended successfull"
