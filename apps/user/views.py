@@ -165,7 +165,7 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
     @swagger_auto_schema(tags=['Autherization'])
 
     def post(self,request):
-        # try:
+        try:
             user_email = request.data.get('user_email',None)
             user_instance = User.objects.filter(email=user_email).first()
 
@@ -175,7 +175,7 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
                 self.response_format['message']='User not found'
                 return Response(self.response_format,status=status.HTTP_404_NOT_FOUND)
             
-            otp = random.randint(1000,9999)
+            otp = random.randint(1000, 9999)
             otp_expiry = timezone.now() + timedelta(minutes=5)
             user_instance.otp = otp
             user_instance.otp_expiry = otp_expiry
@@ -189,6 +189,7 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
                 'domain':settings.EMAIL_DOMAIN,
                 'protocol':'https'
             }
+
             try:
                 send_mail = SendEmail()
                 mail_sending = threading.Thread(
@@ -206,10 +207,10 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
             except Exception as e:
                 self.response_format['status'] = False
                 self.response_format['status_code'] = status.HTTP_400_BAD_REQUEST
-                self.response_format['message'] = 'Please enter valid Email'
+                self.response_format['message'] = 'Failed to send email'
                 return Response(self.response_format,status=status.HTTP_400_BAD_REQUEST)
 
-        # except Exception as e:
+        except Exception as e:
             self.response_format['status'] = False
             self.response_format['status_code'] = status.HTTP_500_INTERNAL_SERVER_ERROR
             self.response_format['message'] = 'Please enter valid email'

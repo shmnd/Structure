@@ -9,7 +9,8 @@ class SendEmail:
         try:
             context=context
             print(context,'contexttttttttttttttttt')
-            html_content = render_to_string(str(template),context={'context':context})
+            # html_content = render_to_string(str(template),context={'context':context})
+            html_content = render_to_string(template, context=context)
             text_content = strip_tags(html_content)
             send_e = EmailMultiAlternatives(
                 subject=str(subject),
