@@ -194,7 +194,7 @@ class UserForgetPasswordApiView(generics.GenericAPIView):
                 send_mail = SendEmail()
                 mail_sending = threading.Thread(
                     target=send_mail.sendTemplateMail,
-                    args=(subject,context,'password_otp.html',settings.EMAIL_HOST_USER,user_email)
+                    args=(subject,context,'password/password_otp.html',settings.EMAIL_HOST_USER,user_email)
                 )
                 mail_sending.start()
                 request.session['user_email'] = user_email
